@@ -1,0 +1,76 @@
+import json
+
+
+def sifre_detayli_analiz(sifre):
+  puan = 0
+  eksikler = []
+  uzunluk = len(sifre)
+
+  if uzunluk == 0:
+    return {"hata": "Lütfen analiz edilecek bir şifre girin."}
+
+  if uzunluk >= 12:
+    puan += 3
+  elif uzunluk >= 8:
+    puan += 2
+  else:
+    eksikler.append("En az 8 karakter uzunluğunda olmalı.")
+
+  kucuk_sayisi = sum(1 for c in sifre if c.islower())
+  buyuk_sayisi = sum(1 for c in sifre if c.isupper())
+  rakam_sayisi = sum(1 for c in sifre if c.isdigit())
+  ozel_sayisi = sum(1 for c in sifre if not c.isalnum())
+
+  if kucuk_sayisi > 0:
+    puan += 1
+  else:
+    eksikler.append("En az bir küçük harf (a-z) içermeli.")
+
+  if buyuk_sayisi > 0:
+    puan += 1
+  else:
+    eksikler.append("En az bir büyük harf (A-Z) içermeli.")
+
+  if rakam_sayisi > 0:
+    puan += 1
+  else:
+    eksikler.append("En az bir rakam (0-9) içermeli.")
+
+  if ozel_sayisi > 0:
+    puan += 1
+  else:
+    eksikler.append("En az bir özel karakter (!, ?, *, _ vb.) içermeli.")
+
+  if puan <= 2:
+    seviye = "Zayıf"
+  elif puan <= 4:
+    seviye = "Orta"
+  elif puan <= 6:
+    seviye = "Güçlü"
+  else:
+    seviye = "Çok Güçlü"
+
+  istatistikler = {
+      "toplam_karakter": uzunluk,
+      "kucuk_harf_orani": f"%{(kucuk_sayisi / uzunluk) * 100:.1f}",
+      "buyuk_harf_orani": f"%{(buyuk_sayisi / uzunluk) * 100:.1f}",
+      "rakam_orani": f"%{(rakam_sayisi / uzunluk) * 100:.1f}",
+      "ozel_karakter_orani": f"%{(ozel_sayisi / uzunluk) * 100:.1f}",
+      "detayli_sayimlar": {
+          "kucuk_harf": kucuk_sayisi,
+          "buyuk_harf": buyuk_sayisi,
+          "rakam": rakam_sayisi,
+          "ozel_karakter": ozel_sayisi,
+      },
+  }
+
+  return {
+      "puan": puan,
+      "seviye": seviye,
+      "istatistikler": istatistikler,
+      "gelistirme_onerileri": eksikler,
+  }
+
+
+sonuc = sifre_detayli_analiz("Pyth*n2026!")
+print(json.dumps(sonuc, indent=4, ensure_ascii=False))
